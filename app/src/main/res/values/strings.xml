@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">HostelAttendance</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_register_no">Register Number</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email completions."</string>
+    <string name="checkbox_remember">Keep me logged in</string>
+    <string name="loginUrl">https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do</string>
+    <string name="userName">1547214</string>
+    <string name="action_settings">Settings</string>
+    <string name="check_sign_in_status">Check Sign In Status</string>
+    <string name="signIn_success">You have successfully signed in at %s</string>
+    <string name="absent">You have Missed Sign In</string>
+    <string name="leave">You are on Leave</string>
+    <string name="pending">You have not yet signed in</string>
+    <string name="title_activity_check_attendance">Check Attendance</string>
+    <string name="sunday">It\'s Sunday Morning! You dont have to sign in.</string>
+    <string name="apply_for_leave">Apply for Leave</string>
+    <string name="meeting_relatives">Meeting Relatives</string>
+
+    <string-array name="leave_type">
+        <item>Medical</item>
+        <item>Exam/Interview</item>
+        <item>Festivals</item>
+        <item>Study Leave</item>
+        <item>Vacation</item>
+        <item>Other</item>
+        <item>Others</item>
+    </string-array>
+
+    <string-array name="leave_reason">
+        <item>Feast at Home</item>
+        <item>Meeting Relatives</item>
+        <item>Entrance Exam Preparation</item>
+        <item>Holiday</item>
+        <item>Travelling out of station</item>
+        <item>Feeling sick</item>
+        <item>Typhoid</item>
+        <item>Malaria</item>
+        <item>Parent not well</item>
+        <item>Family member expired</item>
+        <item>Family member in hospital</item>
+        <item>Relatives met with Accident</item>
+    </string-array>
+</resources>
