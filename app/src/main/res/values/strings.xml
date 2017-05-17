@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HostelAttendance</string>
+    <string name="app_name">CU Hostel</string>
 
     <!-- Strings related to login -->
     <string name="prompt_register_no">Register Number</string>
@@ -24,6 +24,7 @@
     <string name="sunday">It\'s Sunday Morning! You dont have to sign in.</string>
     <string name="apply_for_leave">Apply for Leave</string>
     <string name="meeting_relatives">Meeting Relatives</string>
+    <string name="set_alarm">Set Alarm</string>
 
     <string-array name="leave_type">
         <item>Medical</item>

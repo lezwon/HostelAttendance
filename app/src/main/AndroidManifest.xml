@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.READ_PROFILE"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application
             android:allowBackup="true"
@@ -24,17 +27,36 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".CheckAttendance"
-                android:label="@string/title_activity_check_attendance"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
                 android:name=".CheckAttendanceActivity"
-                android:label="@string/title_activity_check_attendance"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:label="@string/title_activity_check_attendance">
         </activity>
         <activity android:name=".LeaveActivity">
         </activity>
+
+        <receiver
+                android:name=".NotificationBroadcastReceiver"
+                android:enabled="true"
+                android:process=":remote">
+            <intent-filter>
+                <action android:name="edu.app.hostelattendance.sign_in_notification"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+                android:name=".CheckSignInStatusService"
+                android:enabled="true">
+        </service>
+
+        <receiver
+                android:name=".AlarmBroadcastReceiver"
+                android:enabled="true"
+                android:process=":remote"
+                >
+            <intent-filter>
+                <action android:name="edu.app.hostelattendance.ITS_TIME"/>
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

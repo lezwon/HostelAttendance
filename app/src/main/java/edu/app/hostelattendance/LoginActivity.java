@@ -1,11 +1,14 @@
 package edu.app.hostelattendance;
 
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.*;
 import butterknife.BindView;
@@ -44,6 +47,7 @@ public class LoginActivity extends AppCompatActivity{
         ButterKnife.bind(this);
         persistentCookieStore = new PersistentCookieStore(getApplicationContext());
         asyncHttpClient.setCookieStore(persistentCookieStore);
+
     }
 
     @OnClick(R.id.btn_sign_in)
