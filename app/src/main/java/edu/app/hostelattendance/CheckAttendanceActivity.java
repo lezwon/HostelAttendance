@@ -4,29 +4,29 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.*;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.loopj.android.http.PersistentCookieStore;
 
 import java.util.Calendar;
 import java.util.Date;
 
+import static android.content.Context.MODE_PRIVATE;
 
-public class CheckAttendanceActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+
+public class CheckAttendanceActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener{
 
 
-    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
 
     @BindView(R.id.signInText)
     TextView textViewStatus;
+
 
     @BindView(R.id.switch_alarm)
     Switch switchAlarm;
@@ -41,14 +41,17 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_attendance);
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Loading..");
         ButterKnife.bind(this);
+        progressBar = (ProgressBar) findViewById(R.id.indeterminateBar);
         SharedPreferences sharedPrefs = getSharedPreferences("HostelAttendance", MODE_PRIVATE);
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(signInHandler, new IntentFilter("check_sign_in"));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(signInHandler, new IntentFilter("check_sign_in"));
+        progressBar.setVisibility(View.GONE);
+        progressBar.setIndeterminate(true);
         switchAlarm.setChecked(sharedPrefs.getBoolean("alarmStatus", false));
         switchAlarm.setOnCheckedChangeListener(this);
+
+        sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
     }
 
@@ -58,26 +61,34 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
         morning.set(Calendar.HOUR_OF_DAY, 8);
         morning.set(Calendar.MINUTE, 0);
         morning.set(Calendar.SECOND, 0);
-//        morning.add(Calendar.MINUTE,1);
+//        morning.add(Calendar.MINUTE,2);
 
         evening = Calendar.getInstance();
-        evening.set(Calendar.HOUR_OF_DAY, 21);
-        evening.set(Calendar.MINUTE, 0);
-        evening.set(Calendar.SECOND, 0);
-//        evening.add(Calendar.SECOND,20);
+//        evening.set(Calendar.HOUR_OF_DAY, 21);
+//        evening.set(Calendar.MINUTE, 0);
+//        evening.set(Calendar.SECOND, 0);
+        evening.add(Calendar.SECOND,15);
 
 
         // Create two different PendingIntents, they MUST have different requestCodes
-        Intent intent = new Intent("edu.app.hostelattendance.ITS_TIME");
+//        Intent intent = new Intent("edu.app.hostelattendance.ITS_TIME");
+        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
         intent.putExtra("data","Absent");
-        morningAlarm = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, 0);
-        eveningAlarm = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, 0);
+        morningAlarm = PendingIntent.getBroadcast(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        eveningAlarm = PendingIntent.getBroadcast(getApplicationContext(), 1, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
     }
 
+    @OnClick(R.id.btn_logOut)
+    public void logOut(View view){
+        PersistentCookieStore persistentCookieStore = new PersistentCookieStore(this);
+        persistentCookieStore.clear();
+        startActivity(new Intent(this, LoginActivity.class));
+    }
 
     @OnClick(R.id.btn_checkStatus)
     public void showStatus(View view) {
-        progressDialog.show();
+        progressBar.setVisibility(View.VISIBLE);
         startService(new Intent(getBaseContext(), CheckSignInStatusService.class));
     }
 
@@ -89,15 +100,18 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(signInHandler);
+//        LocalBroadcastManager.getInstance(this).unregisterReceiver(signInHandler);
     }
 
-    private BroadcastReceiver signInHandler = new BroadcastReceiver() {
+
+    private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+            progressBar.setVisibility(View.GONE);
+
             // Get extra data included in the Intent
-            String data = intent.getStringExtra("data");
-            String interval = intent.getStringExtra("interval");
+            String data = sharedPreferences.getString("signInStatus",null);
+            String interval = sharedPreferences.getString("interval",null);
             Calendar cal = Calendar.getInstance();
 
             if(interval.equals("evening")){
@@ -130,8 +144,9 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
                 textViewStatus.setText(string);
             }
 
-            progressDialog.dismiss();
+
         }
+
     };
 
     @Override
@@ -145,8 +160,10 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
         if(b){
             // Start both alarms, set to repeat once every day
 
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, morning.getTimeInMillis(), AlarmManager.INTERVAL_DAY, morningAlarm);
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, evening.getTimeInMillis(), AlarmManager.INTERVAL_DAY, eveningAlarm);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, morning.getTimeInMillis(), morningAlarm);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, morning.getTimeInMillis(), AlarmManager.INTERVAL_DAY,morningAlarm);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, evening.getTimeInMillis(), eveningAlarm);
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, evening.getTimeInMillis(),AlarmManager.INTERVAL_DAY, eveningAlarm);
             Toast.makeText(this,"Enabled Alarm",Toast.LENGTH_SHORT).show();
         }
         else{
@@ -160,4 +177,5 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
         editor.putBoolean("alarmStatus", b);
         editor.apply();
     }
+
 }

@@ -66,7 +66,7 @@ public class LeaveActivity extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         Date saturday = c.getTime(); // => Date of this coming Saturday.
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        c.add(Calendar.DAY_OF_WEEK, 1);
         Date sunday = c.getTime(); // => Date of this coming Sunday.
 
         dateFrom.setText(format.format(saturday));
@@ -105,7 +105,11 @@ public class LeaveActivity extends AppCompatActivity {
                             return;
 
                         Document doc = Jsoup.parse(new String(responseBody));
-                        Element fontElement = doc.select("font[face=Arial]").first();
+
+                        Element fontElement = doc.select("font[color=red]").first();
+                        if(!fontElement.hasText())
+                            fontElement = doc.select("font[color=green]").first();
+
                         String response = null;
                         if (fontElement != null)
                             response   = fontElement.text();

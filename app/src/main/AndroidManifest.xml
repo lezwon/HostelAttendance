@@ -3,13 +3,12 @@
           package="edu.app.hostelattendance">
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.READ_PROFILE"/>
-    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.alarm.permission.SET_ALARM"/>
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
             android:allowBackup="true"
@@ -36,6 +35,7 @@
         <receiver
                 android:name=".NotificationBroadcastReceiver"
                 android:enabled="true"
+                android:exported="true"
                 android:process=":remote">
             <intent-filter>
                 <action android:name="edu.app.hostelattendance.sign_in_notification"/>
@@ -44,13 +44,15 @@
 
         <service
                 android:name=".CheckSignInStatusService"
-                android:enabled="true">
+                android:enabled="true"
+                android:exported="true"
+        >
+
         </service>
 
         <receiver
                 android:name=".AlarmBroadcastReceiver"
                 android:enabled="true"
-                android:process=":remote"
                 >
             <intent-filter>
                 <action android:name="edu.app.hostelattendance.ITS_TIME"/>

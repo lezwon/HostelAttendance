@@ -2,12 +2,10 @@ package edu.app.hostelattendance;
 
 import android.app.IntentService;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 import com.loopj.android.http.*;
 import cz.msebera.android.httpclient.Header;
@@ -15,15 +13,23 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.util.Calendar;
 import java.util.Date;
 
-public class CheckSignInStatusService extends IntentService {
-    private PersistentCookieStore persistentCookieStore;
-    private SyncHttpClient syncHttpClient;
+public class CheckSignInStatusService extends Service {
+    private AsyncHttpClient syncHttpClient;
 
-    public CheckSignInStatusService() {
-        super("CheckSignInStatusService");
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        PersistentCookieStore persistentCookieStore = new PersistentCookieStore(this);
+        syncHttpClient = new AsyncHttpClient();
+        syncHttpClient.setCookieStore(persistentCookieStore);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private void checkStatus(){
@@ -39,43 +45,60 @@ public class CheckSignInStatusService extends IntentService {
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 Document doc = Jsoup.parse(responseString);
                 Element table = doc.select("table").last();
-                Intent intent = new Intent("check_sign_in");
-                Intent signInAlarmIntent = new Intent("edu.app.hostelattendance.sign_in_notification");
+//                Intent intent = new Intent("check_sign_in");
+//                Intent signInAlarmIntent = new Intent("edu.app.hostelattendance.sign_in_notification");
                 Element tableRow = table.select("tr").last();
                 Element data = tableRow.select("td").last();
+                SharedPreferences sharedPreferences = getSharedPreferences("HostelAttendance",MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
 
-                intent.putExtra("interval","evening");
+//                intent.putExtra("interval","evening");
+                editor.putString("interval", "evening");
+                editor.putString("currentTime", new Date().toString());
 
                 if(!data.hasText()) {
                     data = tableRow.select("td").get(2);
-                    intent.putExtra("interval","morning");
+                    editor.putString("interval", "morning");
+//                    intent.putExtra("interval","morning");
                 }
 
+//                data.text("Absent");
+
                 // You can also include some extra data.
-                intent.putExtra("data", data.text());
-                signInAlarmIntent.putExtra("data", data.text());
+//                intent.putExtra("data", data.text());
+//                signInAlarmIntent.putExtra("data", data.text());
 
-                SharedPreferences sharedPreferences = getSharedPreferences("HostelAttendance",MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+
                 editor.putString("signInStatus", data.text());
-                editor.apply();
+                editor.commit();
 
-//
-                CheckSignInStatusService.this.sendBroadcast(signInAlarmIntent);
+//                LocalBroadcastManager.getInstance(CheckSignInStatusService.this).sendBroadcast(intent);
+//                sendBroadcast(signInAlarmIntent);
             }
 
         });
     }
 
 
-    @Override
+//    @Override
     protected void onHandleIntent(Intent intent) {
-        persistentCookieStore = new PersistentCookieStore(this);
+        PersistentCookieStore persistentCookieStore = new PersistentCookieStore(this);
         syncHttpClient = new SyncHttpClient();
         syncHttpClient.setCookieStore(persistentCookieStore);
 
         checkStatus();
-//        AlarmActiveBroadcastReceiver.completeWakefulIntent(intent);
-        stopSelf();
+//        AlarmBroadcastReceiver.completeWakefulIntent(intent);
+//        stopSelf();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+
+
+//        AlarmBroadcastReceiver.completeWakefulIntent(intent);
+
+        checkStatus();
+        return START_STICKY;
     }
 }
