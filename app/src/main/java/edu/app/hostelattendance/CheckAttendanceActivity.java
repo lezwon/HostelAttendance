@@ -27,32 +27,55 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     @BindView(R.id.signInText)
     TextView textViewStatus;
 
-
-    @BindView(R.id.switch_alarm)
-    Switch switchAlarm;
+    @BindView(R.id.name)
+    TextView txt_name;
 
     private AlarmManager alarmManager;
     private PendingIntent morningAlarm;
     private PendingIntent eveningAlarm;
     private Calendar morning;
     private Calendar evening;
+    private SharedPreferences sharedPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sharedPrefs = getSharedPreferences("HostelAttendance", MODE_PRIVATE);
+        String name = sharedPrefs.getString("name",null);
+
+        if (name == null)
+            startActivity(new Intent(this, LoginActivity.class));
+
         setContentView(R.layout.activity_check_attendance);
         ButterKnife.bind(this);
         progressBar = (ProgressBar) findViewById(R.id.indeterminateBar);
-        SharedPreferences sharedPrefs = getSharedPreferences("HostelAttendance", MODE_PRIVATE);
 
 //        LocalBroadcastManager.getInstance(this).registerReceiver(signInHandler, new IntentFilter("check_sign_in"));
-        progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.INVISIBLE);
         progressBar.setIndeterminate(true);
-        switchAlarm.setChecked(sharedPrefs.getBoolean("alarmStatus", false));
-        switchAlarm.setOnCheckedChangeListener(this);
-
         sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
+        txt_name.setText(name);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = sharedPrefs.getString("name",null);
+
+        if (name == null)
+            startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void initializeAlarms(){
@@ -83,6 +106,9 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     public void logOut(View view){
         PersistentCookieStore persistentCookieStore = new PersistentCookieStore(this);
         persistentCookieStore.clear();
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.clear();
+        editor.apply();
         startActivity(new Intent(this, LoginActivity.class));
     }
 
@@ -107,7 +133,10 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     private SharedPreferences.OnSharedPreferenceChangeListener sharedPreferenceChangeListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-            progressBar.setVisibility(View.GONE);
+            progressBar.setVisibility(View.INVISIBLE);
+
+            if(!s.equals("currentTime"))
+                return;
 
             // Get extra data included in the Intent
             String data = sharedPreferences.getString("signInStatus",null);

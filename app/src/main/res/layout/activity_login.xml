@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="number"
                 android:maxLines="1"
-                android:text="1547214"
+                android:hint="Register Number"
                 />
 
             </android.support.design.widget.TextInputLayout>
@@ -47,19 +47,13 @@
                 android:imeActionId="@+id/login"
                 android:imeActionLabel="@string/action_sign_in_short"
                 android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
+                android:inputType="numberPassword"
                 android:maxLines="1"
-                android:text="51924676"
+                android:hint="Password"
                 />
 
             </android.support.design.widget.TextInputLayout>
 
-            <CheckBox
-                android:id="@+id/rememberMe"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/checkbox_remember"
-            />
 
             <Button
                 android:id="@+id/btn_sign_in"

@@ -2,6 +2,7 @@ package edu.app.hostelattendance;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
@@ -30,14 +31,13 @@ public class LoginActivity extends AppCompatActivity{
     @BindView(R.id.password)
     TextView txt_password;
 
-    @BindView(R.id.rememberMe)
-    CheckBox chk_rememberMe;
 
     private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 //    private SyncHttpClient asyncHttpClient = new SyncHttpClient();
     private RequestParams requestParams = new RequestParams();
     private PersistentCookieStore persistentCookieStore ;
     private ProgressDialog progressDialog;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,9 +50,27 @@ public class LoginActivity extends AppCompatActivity{
 
         progressDialog = ProgressDialog.show(this,"Please wait...","Initializing Login Page");
         progressDialog.show();
-
+        sharedPreferences = getSharedPreferences("HostelAttendance",MODE_PRIVATE);
         checkUserLoggedIn();
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String name = sharedPreferences.getString("name",null);
+
+        if (name != null)
+            startActivity(new Intent(this, CheckAttendanceActivity.class));
     }
 
     private void checkUserLoggedIn() {
@@ -105,10 +123,16 @@ public class LoginActivity extends AppCompatActivity{
                         Element name = doc.select(".name").first();
 
                         if(name != null){
-                            Toast.makeText(LoginActivity.this, name.text(),Toast.LENGTH_SHORT).show();
 
-                            startActivity(new Intent(LoginActivity.this, CheckAttendanceActivity.class));
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("name", name.text());
+                            editor.apply();
+
+                            Intent intent = new Intent(LoginActivity.this, CheckAttendanceActivity.class);
+                            startActivity(intent);
                         }
+                        else
+                            Toast.makeText(LoginActivity.this, "Incorrect Credentials", Toast.LENGTH_LONG).show();
 
                         progressDialog.dismiss();
                     }

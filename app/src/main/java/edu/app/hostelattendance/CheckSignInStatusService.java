@@ -99,6 +99,6 @@ public class CheckSignInStatusService extends Service {
 //        AlarmBroadcastReceiver.completeWakefulIntent(intent);
 
         checkStatus();
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 }

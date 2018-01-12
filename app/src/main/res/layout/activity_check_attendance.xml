@@ -12,57 +12,53 @@
         tools:context="edu.app.hostelattendance.CheckAttendanceActivity"
         android:orientation="vertical">
 
-        <Button
-                android:id="@+id/btn_checkStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/check_sign_in_status"
-                android:layout_gravity="center"
-        />
+    <ProgressBar
+            android:id="@+id/indeterminateBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="?android:attr/progressBarStyleHorizontal"
+    />
 
-        <ProgressBar
-                android:id="@+id/indeterminateBar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                style="?android:attr/progressBarStyleHorizontal"
-        />
+    <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+    />
 
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/btn_leave"
-                android:text="@string/apply_for_leave"
-                android:layout_gravity="center"
-        />
+    <Button
+            android:id="@+id/btn_checkStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/check_sign_in_status"
+            android:layout_gravity="center"
+    />
 
-        <TextView
-                android:id="@+id/signInText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="21sp"
-        />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/set_alarm"
-                android:layout_gravity="center"
-                android:textSize="20sp"
-        />
 
-        <Switch
-                android:id="@+id/switch_alarm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-        />
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_leave"
+            android:text="@string/apply_for_leave"
+            android:layout_gravity="center"
+    />
 
-        <Button
-                android:id="@+id/btn_logOut"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Log Out"
-                android:layout_gravity="center"
-        />
+
+    <Button
+            android:id="@+id/btn_logOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Log Out"
+            android:layout_gravity="center"
+    />
+
+    <TextView
+            android:id="@+id/signInText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="21sp"
+            android:layout_gravity="center"
+    />
 
 </LinearLayout>
