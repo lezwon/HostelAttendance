@@ -48,10 +48,8 @@ public class LoginActivity extends AppCompatActivity{
 //        asyncHttpClient.setCookieStore(persistentCookieStore);
         asyncHttpClient.setCookieStore(persistentCookieStore);
 
-        progressDialog = ProgressDialog.show(this,"Please wait...","Initializing Login Page");
-        progressDialog.show();
         sharedPreferences = getSharedPreferences("HostelAttendance",MODE_PRIVATE);
-        checkUserLoggedIn();
+
 
     }
 
@@ -73,29 +71,7 @@ public class LoginActivity extends AppCompatActivity{
             startActivity(new Intent(this, CheckAttendanceActivity.class));
     }
 
-    private void checkUserLoggedIn() {
 
-        asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do?method=returnHomePage", requestParams, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                Document doc = Jsoup.parse(new String(responseBody));
-                Element name = doc.select(".name").first();
-
-                progressDialog.dismiss();
-
-                if(name != null) {
-                    startActivity(new Intent(LoginActivity.this, CheckAttendanceActivity.class));
-                }
-
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-
-            }
-        });
-
-    }
 
     @OnClick(R.id.btn_sign_in)
     void signIn(View view){
@@ -144,38 +120,6 @@ public class LoginActivity extends AppCompatActivity{
                         progressDialog.dismiss();
                     }
                 });
-
-                /*String page = new String(responseBody);
-                Document doc = Jsoup.parse(page);
-                Element image = doc.select("#captcha_img").first();
-                String imageLink = image.attr("src");
-                imageLink = "https://kp.christuniversity.in/KnowledgePro/".concat(imageLink);
-
-
-                RequestParams requestParams = new RequestParams();
-                requestParams.add("url",imageLink);
-                AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-                asyncHttpClient.addHeader("apikey","b45d91153188957");
-                asyncHttpClient.post("https://api.ocr.space/parse/image", requestParams, new JsonHttpResponseHandler(){
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                        try {
-                            response.getJSONArray(0).getString(1);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    @Override
-                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                        super.onFailure(statusCode, headers, responseString, throwable);
-                    }
-                });*/
-
-                /*Attempt Login*/
-
 
             }
 

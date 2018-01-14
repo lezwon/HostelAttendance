@@ -11,12 +11,16 @@ import android.widget.*;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.PersistentCookieStore;
+import cz.msebera.android.httpclient.Header;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.util.Calendar;
 import java.util.Date;
-
-import static android.content.Context.MODE_PRIVATE;
 
 
 public class CheckAttendanceActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener{
@@ -35,17 +39,23 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     private PendingIntent eveningAlarm;
     private Calendar morning;
     private Calendar evening;
-    private SharedPreferences sharedPrefs;
+    private SharedPreferences sharedPreferences;
+    private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+
+    private ProgressDialog progressDialog;
+    private boolean paused;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        PersistentCookieStore persistentCookieStore = new PersistentCookieStore(getApplicationContext());
+//        asyncHttpClient.setCookieStore(persistentCookieStore);
+        asyncHttpClient.setCookieStore(persistentCookieStore);
 
-        sharedPrefs = getSharedPreferences("HostelAttendance", MODE_PRIVATE);
-        String name = sharedPrefs.getString("name",null);
+        progressDialog = ProgressDialog.show(this, "CU Hostel", "Please Wait...");
+        progressDialog.show();
+        checkUserLoggedIn();
 
-        if (name == null)
-            startActivity(new Intent(this, LoginActivity.class));
 
         setContentView(R.layout.activity_check_attendance);
         ButterKnife.bind(this);
@@ -54,17 +64,53 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
 //        LocalBroadcastManager.getInstance(this).registerReceiver(signInHandler, new IntentFilter("check_sign_in"));
         progressBar.setVisibility(View.INVISIBLE);
         progressBar.setIndeterminate(true);
-        sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
+        sharedPreferences = getSharedPreferences("HostelAttendance", MODE_PRIVATE);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(sharedPreferenceChangeListener);
 
+        String name = sharedPreferences.getString("name", null);
         txt_name.setText(name);
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        String name = sharedPrefs.getString("name",null);
+    private void checkUserLoggedIn() {
 
+        asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do?method=returnHomePage", null , new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                Document doc = Jsoup.parse(new String(responseBody));
+                Element name = doc.select(".name").first();
+                progressDialog.dismiss();
+
+                if(name == null) {
+                    sharedPreferences.edit().clear().apply();
+                    startActivity(new Intent(CheckAttendanceActivity.this, LoginActivity.class));
+                }
+
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+
+            }
+        });
+
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        paused = true;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(!paused)
+            return;
+
+        String name = sharedPreferences.getString("name",null);
         if (name == null)
             startActivity(new Intent(this, LoginActivity.class));
     }
@@ -106,7 +152,7 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     public void logOut(View view){
         PersistentCookieStore persistentCookieStore = new PersistentCookieStore(this);
         persistentCookieStore.clear();
-        SharedPreferences.Editor editor = sharedPrefs.edit();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
         startActivity(new Intent(this, LoginActivity.class));
