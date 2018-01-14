@@ -31,6 +31,9 @@ public class LoginActivity extends AppCompatActivity{
     @BindView(R.id.password)
     TextView txt_password;
 
+    @BindView(R.id.chk_rememberMe)
+    CheckBox rememberMe;
+
 
     private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 //    private SyncHttpClient asyncHttpClient = new SyncHttpClient();
@@ -47,10 +50,26 @@ public class LoginActivity extends AppCompatActivity{
         persistentCookieStore = new PersistentCookieStore(getApplicationContext());
 //        asyncHttpClient.setCookieStore(persistentCookieStore);
         asyncHttpClient.setCookieStore(persistentCookieStore);
-
         sharedPreferences = getSharedPreferences("HostelAttendance",MODE_PRIVATE);
+        requestParams.put("generatedCaptchaHash","673dbeb6bba34a75584404488455d987");
+        requestParams.put("generatedCaptcha","8e2K6e/4CTA=");
+        requestParams.put("enteredCaptcha","089d52");
+        autoLogin();
 
+    }
 
+    private void autoLogin() {
+        progressDialog = ProgressDialog.show(this,"CU Hostel","Please wait...");
+        progressDialog.show();
+        String registerNo = sharedPreferences.getString("registerNo", null);
+        if(registerNo != null){
+            String password = sharedPreferences.getString("password", null);
+            requestParams.put("username", registerNo);
+            requestParams.put("password",password);
+            signIn();
+        }
+        else
+            progressDialog.dismiss();
     }
 
     @Override
@@ -83,10 +102,13 @@ public class LoginActivity extends AppCompatActivity{
 
         requestParams.put("username", txt_registerNo.getText());
         requestParams.put("password",txt_password.getText());
-        requestParams.put("generatedCaptchaHash","673dbeb6bba34a75584404488455d987");
-        requestParams.put("generatedCaptcha","8e2K6e/4CTA=");
-        requestParams.put("enteredCaptcha","089d52");
 
+        signIn();
+
+
+    }
+
+    private void signIn() {
         /*Check if valid*/
         asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do?method=isValidUser", requestParams, new AsyncHttpResponseHandler() {
             @Override
@@ -99,9 +121,15 @@ public class LoginActivity extends AppCompatActivity{
                         Element name = doc.select(".name").first();
 
                         if(name != null){
-
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putString("name", name.text());
+
+                            if(rememberMe.isChecked()){
+                                editor.putString("registerNo", txt_registerNo.getText().toString());
+                                editor.putString("password", txt_password.getText().toString());
+                            }
+
+
                             editor.apply();
 
                             Intent intent = new Intent(LoginActivity.this, CheckAttendanceActivity.class);
@@ -115,7 +143,7 @@ public class LoginActivity extends AppCompatActivity{
 
                     @Override
                     public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                        Toast.makeText(LoginActivity.this, "Invalid Credentials",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Please check your internet connection",Toast.LENGTH_SHORT).show();
                         error.printStackTrace();
                         progressDialog.dismiss();
                     }
@@ -130,9 +158,6 @@ public class LoginActivity extends AppCompatActivity{
                 progressDialog.dismiss();
             }
         });
-
-
-
     }
 }
 
