@@ -72,6 +72,13 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
 
     }
 
+    @OnClick(R.id.btn_clear_cookies)
+    public void clearCookies(){
+        new PersistentCookieStore(this).clear();
+        Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
+//        startActivity(new Intent(CheckAttendanceActivity.this, LoginActivity.class));
+    }
+
     private void checkUserLoggedIn() {
 
         asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do?method=returnHomePage", null , new AsyncHttpResponseHandler() {
@@ -82,7 +89,7 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
                 progressDialog.dismiss();
 
                 if(name == null) {
-                    sharedPreferences.edit().clear().apply();
+//                    sharedPreferences.edit().clear().apply();
                     startActivity(new Intent(CheckAttendanceActivity.this, LoginActivity.class));
                 }
 
@@ -152,9 +159,7 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     public void logOut(View view){
         PersistentCookieStore persistentCookieStore = new PersistentCookieStore(this);
         persistentCookieStore.clear();
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.apply();
+        sharedPreferences.edit().clear().apply();
         startActivity(new Intent(this, LoginActivity.class));
     }
 

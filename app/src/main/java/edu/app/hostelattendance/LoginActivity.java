@@ -34,6 +34,7 @@ public class LoginActivity extends AppCompatActivity{
     @BindView(R.id.chk_rememberMe)
     CheckBox rememberMe;
 
+    static int count = 1;
 
     private AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 //    private SyncHttpClient asyncHttpClient = new SyncHttpClient();
@@ -62,7 +63,7 @@ public class LoginActivity extends AppCompatActivity{
         progressDialog = ProgressDialog.show(this,"CU Hostel","Please wait...");
         progressDialog.show();
         String registerNo = sharedPreferences.getString("registerNo", null);
-        if(registerNo != null){
+        if(!(registerNo == null || registerNo.equals(""))){
             String password = sharedPreferences.getString("password", null);
             requestParams.put("username", registerNo);
             requestParams.put("password",password);
@@ -84,10 +85,10 @@ public class LoginActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        String name = sharedPreferences.getString("name",null);
+//        String name = sharedPreferences.getString("name",null);
 
-        if (name != null)
-            startActivity(new Intent(this, CheckAttendanceActivity.class));
+//        if (name != null)
+//            startActivity(new Intent(this, CheckAttendanceActivity.class));
     }
 
 
@@ -109,7 +110,8 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     private void signIn() {
-        /*Check if valid*/
+
+//        Check if valid
         asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do?method=isValidUser", requestParams, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
