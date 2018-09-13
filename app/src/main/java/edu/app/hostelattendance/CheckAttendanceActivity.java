@@ -81,7 +81,7 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
 
     private void checkUserLoggedIn() {
 
-        asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do?method=returnHomePage", null , new AsyncHttpResponseHandler() {
+        asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginNewAction.do?method=returnHomePage", null , new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 Document doc = Jsoup.parse(new String(responseBody));
