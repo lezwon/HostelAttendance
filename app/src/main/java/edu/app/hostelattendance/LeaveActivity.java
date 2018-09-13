@@ -66,7 +66,7 @@ public class LeaveActivity extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         Date saturday = c.getTime(); // => Date of this coming Saturday.
-        c.add(Calendar.DAY_OF_WEEK, 1);
+        c.add(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         Date sunday = c.getTime(); // => Date of this coming Sunday.
 
         dateFrom.setText(format.format(saturday));
@@ -78,7 +78,7 @@ public class LeaveActivity extends AppCompatActivity {
         requestParams.add("startDate", format.format(saturday));
         requestParams.add("endDate", format.format(sunday));
         requestParams.add("leaveFromSession","Evening");
-        requestParams.add("leaveToSession","Evening");
+        requestParams.add("leaveToSession","Morning");
 
         spnLeaveType.setSelection(6);
         spnLeaveReason.setSelection(1);
@@ -106,6 +106,8 @@ public class LeaveActivity extends AppCompatActivity {
 
                         Document doc = Jsoup.parse(new String(responseBody));
 
+                        try {
+
                         Element fontElement = doc.select("font[color=red]").first();
                         if(!fontElement.hasText())
                             fontElement = doc.select("font[color=green]").first();
@@ -113,18 +115,24 @@ public class LeaveActivity extends AppCompatActivity {
                         String response = null;
                         if (fontElement != null)
                             response   = fontElement.text();
+                            AlertDialog alertDialog = new AlertDialog.Builder(LeaveActivity.this)
+                                    .setMessage(response)
+                                    .setCancelable(false)
+                                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            LeaveActivity.this.finish();
+                                        }
+                                    }).create();
 
-                        AlertDialog alertDialog = new AlertDialog.Builder(LeaveActivity.this)
-                                .setMessage(response)
-                                .setCancelable(false)
-                                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        LeaveActivity.this.finish();
-                                    }
-                                }).create();
+                            alertDialog.show();
+                        }catch (Exception e){
+                            Toast.makeText(getApplicationContext(), "Your hostel details are not available", Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
+                            e.printStackTrace();
+                        }
 
-                        alertDialog.show();
+
 
                     }
 

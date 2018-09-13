@@ -72,13 +72,6 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
 
     }
 
-    @OnClick(R.id.btn_clear_cookies)
-    public void clearCookies(){
-        new PersistentCookieStore(this).clear();
-        Toast.makeText(this, "Done", Toast.LENGTH_SHORT).show();
-//        startActivity(new Intent(CheckAttendanceActivity.this, LoginActivity.class));
-    }
-
     private void checkUserLoggedIn() {
 
         asyncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginNewAction.do?method=returnHomePage", null , new AsyncHttpResponseHandler() {
@@ -166,7 +159,7 @@ public class CheckAttendanceActivity extends AppCompatActivity implements Compou
     @OnClick(R.id.btn_checkStatus)
     public void showStatus(View view) {
         progressBar.setVisibility(View.VISIBLE);
-        startService(new Intent(getBaseContext(), CheckSignInStatusService.class));
+            startService(new Intent(getBaseContext(), CheckSignInStatusService.class));
     }
 
     @OnClick(R.id.btn_leave)

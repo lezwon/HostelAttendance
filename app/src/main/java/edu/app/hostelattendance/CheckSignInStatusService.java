@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.View;
 import android.widget.Toast;
 import com.loopj.android.http.*;
 import cz.msebera.android.httpclient.Header;
@@ -39,14 +40,19 @@ public class CheckSignInStatusService extends Service {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Toast.makeText(CheckSignInStatusService.this,responseString,Toast.LENGTH_SHORT).show();
+                try {
+                    throw throwable;
+                } catch (Throwable throwable1) {
+                    throwable1.printStackTrace();
+                }
             }
 
             @Override
             public void onSuccess(int statusCode, Header[] headers, String responseString) {
                 Document doc = Jsoup.parse(responseString);
+
+                try {
                 Element table = doc.select("table").last();
-//                Intent intent = new Intent("check_sign_in");
-//                Intent signInAlarmIntent = new Intent("edu.app.hostelattendance.sign_in_notification");
                 Element tableRow = table.select("tr").last();
                 Element data = tableRow.select("td").last();
                 SharedPreferences sharedPreferences = getSharedPreferences("HostelAttendance",MODE_PRIVATE);
@@ -59,21 +65,16 @@ public class CheckSignInStatusService extends Service {
                 if(!data.hasText()) {
                     data = tableRow.select("td").get(2);
                     editor.putString("interval", "morning");
-//                    intent.putExtra("interval","morning");
                 }
 
-//                data.text("Absent");
-
-                // You can also include some extra data.
-//                intent.putExtra("data", data.text());
-//                signInAlarmIntent.putExtra("data", data.text());
-
-
                 editor.putString("signInStatus", data.text());
-                editor.commit();
+                editor.apply();
 
-//                LocalBroadcastManager.getInstance(CheckSignInStatusService.this).sendBroadcast(intent);
-//                sendBroadcast(signInAlarmIntent);
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(), "Your hostel details are not available", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
+
             }
 
         });
