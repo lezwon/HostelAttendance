@@ -36,7 +36,7 @@ public class CheckSignInStatusService extends Service {
     private void checkStatus(){
         RequestParams requestParams = new RequestParams("method", "getHostelStudentsAttendanceSummary");
 
-        syncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginAction.do", requestParams, new TextHttpResponseHandler() {
+        syncHttpClient.get("https://kp.christuniversity.in/KnowledgePro/StudentLoginNewAction.do", requestParams, new TextHttpResponseHandler() {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Toast.makeText(CheckSignInStatusService.this,responseString,Toast.LENGTH_SHORT).show();
